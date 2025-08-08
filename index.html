@@ -1,0 +1,1240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>UNIDEL Post-UTME Practice</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+    body { background: #f9f4ff; color: #333; }
+    .page { display: none; padding: 2rem; max-width: 800px; margin: auto; }
+    .active { display: block; }
+    h1 { color: #6a0dad; margin-bottom: 1rem; }
+    button, select, input[type="email"] {
+      padding: 10px 15px; border: none; border-radius: 8px; margin-top: 1rem;
+    }
+    button { background: #6a0dad; color: white; cursor: pointer; }
+    button:hover { background: #580f8c; }
+    .question { background: white; padding: 1rem; border-radius: 10px; margin-bottom: 1rem; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+    .timer { font-weight: bold; color: #d60000; margin-bottom: 1rem; }
+    .hidden { display: none; }
+    .subject-option { margin: 8px 0; }
+  </style>
+</head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6409235945994051"
+     crossorigin="anonymous"></script>
+<!-- Unidel ad -->
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-6409235945994051"
+     data-ad-slot="8188113567"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+<body>
+
+<!-- Page 1: Email Entry -->
+<div class="page active" id="emailPage">
+  <h1>Welcome to UNIDEL Practice</h1>
+  <p>Enter your email to start:</p>
+  <input type="email" id="email" placeholder="Enter your email" required />
+  <br />
+  <button onclick="goToSubjectPage()">Continue</button>
+</div>
+
+<!-- Page 2: Subject Selection -->
+<div class="page" id="subjectPage">
+  <h1>Select 4 Subjects</h1>
+  <p>Choose exactly 4 subjects to begin the exam:</p>
+  <div id="subjectList"></div>
+  <button onclick="startExam()">Start Exam</button>
+</div>
+
+<!-- Page 3: Exam Page -->
+<div class="page" id="examPage">
+  <h1>UNIDEL Post-UTME Exam</h1>
+  <div class="timer" id="timer">25:00</div>
+  <form id="examForm"></form>
+  <button onclick="submitExam()">Submit Exam</button>
+  <div id="result" class="hidden"></div>
+</div>
+<script>
+const allQuestions = {
+  "Chemistry": [
+    { question: "The atomic number of an element is the number of:", options: ["Neutrons", "Protons", "Electrons and protons", "Electrons and neutrons"], answer: "Protons" },
+    { question: "Isotopes are atoms of the same element with:", options: ["Same mass number", "Different atomic number", "Same atomic number, different mass numbers", "Same number of neutrons"], answer: "Same atomic number, different mass numbers" },
+    { question: "Which of the following is a noble gas?", options: ["Nitrogen", "Oxygen", "Neon", "Chlorine"], answer: "Neon" },
+    { question: "The electronic configuration of sodium (Z = 11) is:", options: ["2, 8, 1", "2, 7, 2", "2, 6, 3", "2, 5, 4"], answer: "2, 8, 1" },
+    { question: "What is the maximum number of electrons in the third shell?", options: ["2", "8", "18", "32"], answer: "18" },
+    { question: "Elements in the same group of the periodic table have:", options: ["Different valency", "Similar chemical properties", "Same atomic size", "Same atomic number"], answer: "Similar chemical properties" },
+    { question: "Across a period, atomic radius:", options: ["Increases", "Decreases", "Remains constant", "Doubles"], answer: "Decreases" },
+    { question: "The most electronegative element is:", options: ["Oxygen", "Chlorine", "Fluorine", "Nitrogen"], answer: "Fluorine" },
+    { question: "Alkali metals are found in:", options: ["Group I", "Group II", "Group IV", "Group VII"], answer: "Group I" },
+    { question: "Which element has the largest atomic radius?", options: ["Na", "Mg", "Cl", "Ne"], answer: "Na" },
+    { question: "Ionic bonds are formed between:", options: ["Metals and non-metals", "Non-metals only", "Metals only", "Noble gases"], answer: "Metals and non-metals" },
+    { question: "The type of bond in a hydrogen molecule is:", options: ["Ionic", "Metallic", "Covalent", "Van der Waals"], answer: "Covalent" },
+    { question: "What type of bond exists in sodium chloride?", options: ["Covalent", "Metallic", "Ionic", "Hydrogen"], answer: "Ionic" },
+    { question: "Hydrogen bonding is strongest in:", options: ["CH₄", "NH₃", "HCl", "CO₂"], answer: "NH₃" },
+    { question: "The shape of a methane (CH₄) molecule is:", options: ["Linear", "Tetrahedral", "Trigonal planar", "Angular"], answer: "Tetrahedral" },
+    { question: "Which of the following is not a state of matter?", options: ["Solid", "Gas", "Plasma", "Fog"], answer: "Fog" },
+    { question: "Boyle’s law relates:", options: ["Pressure and volume", "Volume and temperature", "Pressure and temperature", "Mass and volume"], answer: "Pressure and volume" },
+    { question: "Which gas law is represented by PV = nRT?", options: ["Boyle’s Law", "Charles’ Law", "Ideal Gas Law", "Avogadro’s Law"], answer: "Ideal Gas Law" },
+    { question: "The melting point of a solid is the temperature at which:", options: ["Solid turns to gas", "Liquid becomes gas", "Solid turns to liquid", "Gas becomes solid"], answer: "Solid turns to liquid" },
+    { question: "Real gases deviate from ideal behavior at:", options: ["Low pressure and high temperature", "High pressure and low temperature", "Low temperature and low pressure", "High pressure and high temperature"], answer: "High pressure and low temperature" },
+    { question: "An acid is a substance that:", options: ["Donates OH⁻ ions", "Accepts electrons", "Donates H⁺ ions", "Neutralizes salts"], answer: "Donates H⁺ ions" },
+    { question: "A base turns red litmus paper:", options: ["Green", "Blue", "Colorless", "Yellow"], answer: "Blue" },
+    { question: "The pH of a neutral solution is:", options: ["1", "5", "7", "14"], answer: "7" },
+    { question: "Which of the following is a weak acid?", options: ["HCl", "H₂SO₄", "CH₃COOH", "HNO₃"], answer: "CH₃COOH" },
+    { question: "The salt formed from HCl and NaOH is:", options: ["NaCl", "KCl", "H₂O", "NaNO₃"], answer: "NaCl" },
+    { question: "A chemical reaction that releases heat is:", options: ["Endothermic", "Exothermic", "Catalytic", "Neutralization"], answer: "Exothermic" },
+    { question: "The molar mass of H₂O is:", options: ["16 g/mol", "18 g/mol", "20 g/mol", "2 g/mol"], answer: "18 g/mol" },
+    { question: "How many moles are in 44g of CO₂? (C = 12, O = 16)", options: ["2", "1", "0.5", "3"], answer: "1" },
+    { question: "Which of the following is a redox reaction?", options: ["Neutralization", "Acid + base", "Combustion", "Precipitation"], answer: "Combustion" },
+    { question: "A catalyst:", options: ["Increases the activation energy", "Changes the product", "Is consumed in a reaction", "Speeds up the rate of reaction"], answer: "Speeds up the rate of reaction" },
+    { question: "Electrolysis involves:", options: ["Heating substances", "Boiling solutions", "Passing electricity through solutions", "Mixing acids"], answer: "Passing electricity through solutions" },
+    { question: "In electrolysis, reduction occurs at the:", options: ["Anode", "Cathode", "Electrolyte", "Salt bridge"], answer: "Cathode" },
+    { question: "Which electrode is positive in electrolysis?", options: ["Cathode", "Anode", "Both", "None"], answer: "Anode" },
+    { question: "The electrolyte in a lead-acid battery is:", options: ["Hydrochloric acid", "Nitric acid", "Sulfuric acid", "Sodium hydroxide"], answer: "Sulfuric acid" },
+    { question: "Faraday's First Law relates mass of substance deposited to:", options: ["Current only", "Voltage only", "Time only", "Quantity of electricity"], answer: "Quantity of electricity" },
+    { question: "Alkanes are:", options: ["Unsaturated hydrocarbons", "Aromatic compounds", "Saturated hydrocarbons", "Alcohols"], answer: "Saturated hydrocarbons" },
+    { question: "The general formula of alkanes is:", options: ["CnH2n", "CnH2n+2", "CnH2n-2", "CnH2n+1"], answer: "CnH2n+2" },
+    { question: "Ethene is used in:", options: ["Cooking", "Fruit ripening", "Soap production", "Detergent making"], answer: "Fruit ripening" },
+    { question: "The functional group in alcohols is:", options: ["–COOH", "–OH", "–NH₂", "–CO"], answer: "–OH" },
+    { question: "Which of these is an aromatic compound?", options: ["Ethane", "Benzene", "Butane", "Propane"], answer: "Benzene" },
+    { question: "The gas responsible for acid rain is:", options: ["CO₂", "SO₂", "CH₄", "N₂"], answer: "SO₂" },
+    { question: "Greenhouse effect is mainly caused by:", options: ["O₂", "CO₂", "N₂", "He"], answer: "CO₂" },
+    { question: "Ozone layer depletion is caused by:", options: ["Chlorofluorocarbons", "CO₂", "Dust", "NO₂"], answer: "Chlorofluorocarbons" },
+    { question: "Water pollution can be reduced by:", options: ["Burning plastic", "Dumping waste", "Recycling", "Using more chemicals"], answer: "Recycling" },
+    { question: "Eutrophication is caused by:", options: ["Pesticides", "Oil spills", "Excess fertilizers", "Deforestation"], answer: "Excess fertilizers" },
+    { question: "Which of the following is a mixture?", options: ["Air", "Sodium", "Water", "Glucose"], answer: "Air" },
+    { question: "A pure substance has:", options: ["Variable boiling point", "Fixed boiling point", "Multiple melting points", "No chemical formula"], answer: "Fixed boiling point" },
+    { question: "Filtration is used to separate:", options: ["Two liquids", "A solid from a liquid", "Two solids", "Gases"], answer: "A solid from a liquid" },
+    { question: "Sublimation involves:", options: ["Solid → Liquid", "Liquid → Gas", "Solid → Gas", "Gas → Liquid"], answer: "Solid → Gas" },
+    { question: "The gas that burns with a pop sound is:", options: ["Oxygen", "Carbon dioxide", "Nitrogen", "Hydrogen"], answer: "Hydrogen" }
+  ]
+  ,"English" : [
+   
+  { question: "The man was known for his parsimonious nature.", options: ["generous", "stingy", "talkative", "proud"], answer: "stingy" },
+  { question: "The teacher was always meticulous in grading scripts.", options: ["careless", "accurate", "fast", "slow"], answer: "accurate" },
+  { question: "We should not take the law into our own hands. This means we should not:", options: ["punish others without authority", "speak against the law", "call the police", "arrest criminals"], answer: "punish others without authority" },
+  { question: "She danced as if she ___ a professional.", options: ["was", "were", "is", "had been"], answer: "were" },
+  { question: "If I had known, I ___ have gone with you.", options: ["will", "would", "should", "shall"], answer: "would" },
+  { question: "The manager gave the workers a stern ___ about punctuality.", options: ["advice", "advise", "warning", "caution"], answer: "warning" },
+  { question: "The students were told to be quiet, ___ they continued to make noise.", options: ["so", "or", "but", "because"], answer: "but" },
+  { question: "The crowd was too large for the hall to ___.", options: ["contain", "control", "manage", "accommodate"], answer: "accommodate" },
+  { question: "After working so hard, she deserves some ___.", options: ["recreation", "rest", "relaxation", "sleep"], answer: "relaxation" },
+  { question: "She is the kind of person who likes to blow her own ___.", options: ["trumpet", "whistle", "horn", "flute"], answer: "trumpet" },
+  { question: "The teacher asked him to ___ the essay.", options: ["rewrite", "rewrite it", "rewrite again", "re-write it again"], answer: "rewrite it" },
+  { question: "His arguments were sound and ___.", options: ["illogical", "coherent", "irrational", "lame"], answer: "coherent" },
+  { question: "He was accused of trying to ___ the witnesses.", options: ["bribe", "deceive", "influence", "threaten"], answer: "bribe" },
+  { question: "We watched the soldier as he cleaned his ___.", options: ["riffle", "riffel", "rifle", "raffel"], answer: "rifle" },
+  { question: "She prefers tea ___ coffee.", options: ["for", "to", "than", "over"], answer: "to" },
+  { question: "I look forward to ___ from you soon.", options: ["hearing", "hear", "heard", "having hear"], answer: "hearing" },
+  { question: "The players were congratulated ___ their victory.", options: ["on", "at", "for", "of"], answer: "on" },
+  { question: "The boy was punished because he had been ___.", options: ["obedient", "lazy", "industrious", "disobedient"], answer: "disobedient" },
+  { question: "The judge ruled the case in his ___.", options: ["favour", "fever", "flavor", "favouring"], answer: "favour" },
+  { question: "The students went on a protest because they felt they were being ___.", options: ["treated", "maltreated", "misled", "cheated"], answer: "maltreated" },
+
+  { question: "According to the passage, success depends mostly on:", options: ["intelligence", "natural gifts", "perseverance", "luck"], answer: "perseverance" },
+  { question: "The author suggests that talent without effort is:", options: ["sufficient", "useless", "uncommon", "overrated"], answer: "overrated" },
+  { question: "The tone of the passage can best be described as:", options: ["sarcastic", "persuasive", "humorous", "aggressive"], answer: "persuasive" },
+  { question: "Which of these is NOT mentioned as a factor for success?", options: ["Hard work", "Discipline", "Consistency", "Beauty"], answer: "Beauty" },
+  { question: "The expression “innate ability” means:", options: ["learned skills", "born-with talents", "studied knowledge", "group efforts"], answer: "born-with talents" },
+
+  { question: "A major cause of environmental problems is:", options: ["school education", "natural changes", "human activities", "wildlife migration"], answer: "human activities" },
+  { question: "Which of the following is a consequence of environmental abuse?", options: ["Improved climate", "Extinction of species", "Increase in jobs", "Peaceful society"], answer: "Extinction of species" },
+  { question: "How can individuals help the environment?", options: ["Cut more trees", "Use more plastics", "Conserve energy", "Travel more"], answer: "Conserve energy" },
+  { question: "Which is NOT mentioned as a human activity affecting the environment?", options: ["Deforestation", "Farming", "Pollution", "Overpopulation"], answer: "Farming" },
+  { question: "The general message of the passage is:", options: ["The government should act fast", "Nature will correct itself", "Everyone should protect the environment", "Human population should increase"], answer: "Everyone should protect the environment" },
+  { question: "Natural disasters result from:", options: ["government policy", "changing leadership", "environmental degradation", "religious activities"], answer: "environmental degradation" },
+  { question: "The phrase \"conserving energy\" means:", options: ["using energy wisely", "reducing money spent", "switching off the radio", "saving people’s strength"], answer: "using energy wisely" },
+  { question: "Overpopulation contributes to environmental damage because it:", options: ["promotes unity", "increases demand for resources", "causes rainfall", "prevents farming"], answer: "increases demand for resources" },
+  { question: "Which of these is a result of climate change?", options: ["Technology growth", "Balanced rainfall", "Global warming", "Faster education"], answer: "Global warming" },
+  { question: "The phrase “under threat” means:", options: ["being developed", "growing fast", "in danger", "being watched"], answer: "in danger" },
+
+  { question: "The word knife has a silent:", options: ["k", "i", "n", "e"], answer: "k" },
+  { question: "The stress in the word photograph falls on the:", options: ["first syllable", "second syllable", "third syllable", "last syllable"], answer: "first syllable" },
+  { question: "In which word is the underlined part pronounced /i:/:", options: ["seen", "sit", "seat", "bed"], answer: "seen" },
+  { question: "The vowel sound in the word cat is:", options: ["/e/", "/æ/", "/a:/", "/ʌ/"], answer: "/æ/" },
+  { question: "The word honest has a silent:", options: ["h", "o", "n", "s"], answer: "h" },
+  { question: "Choose the odd one out based on vowel sound:", options: ["mat", "fat", "rate", "sat"], answer: "rate" },
+  { question: "The intonation pattern for the question “Are you coming?” is:", options: ["falling", "rising", "flat", "wavy"], answer: "rising" },
+  { question: "The plural form of sheep is:", options: ["sheeps", "sheep", "sheepes", "shep"], answer: "sheep" },
+  { question: "The correct transcription of school begins with:", options: ["/ʃ/", "/s/", "/k/", "/sk/"], answer: "/sk/" },
+  { question: "The word cough ends with the sound:", options: ["/f/", "/g/", "/k/", "/v/"], answer: "/f/" },
+  { question: "The stress pattern in the word development is on the:", options: ["first syllable", "second syllable", "third syllable", "fourth syllable"], answer: "third syllable" },
+  { question: "The consonant /θ/ is found in:", options: ["father", "thin", "then", "them"], answer: "thin" },
+  { question: "Which word contains a diphthong?", options: ["go", "get", "gate", "got"], answer: "gate" },
+  { question: "In the word comb, the letter b is:", options: ["pronounced", "stressed", "silent", "long"], answer: "silent" },
+  { question: "Which of the following is a voiced consonant?", options: ["/p/", "/k/", "/g/", "/t/"], answer: "/g/" }
+]
+  
+  ,"Government": [
+  { question: "A constitution is best described as:", options: ["a set of political campaigns", "a book of laws for court use only", "the fundamental law of a country", "decisions made by the legislature"], answer: "the fundamental law of a country" },
+  { question: "Which of the following is not a feature of a written constitution?", options: ["Clarity", "Supremacy", "Flexibility", "Codification"], answer: "Flexibility" },
+  { question: "Nigeria’s first Republican Constitution was enacted in:", options: ["1954", "1960", "1963", "1979"], answer: "1963" },
+  { question: "The independence constitution of 1960 made Nigeria a:", options: ["federal republic", "unitary state", "constitutional monarchy", "confederation"], answer: "constitutional monarchy" },
+  { question: "Which constitution introduced regional autonomy in Nigeria?", options: ["1922 Constitution", "1946 Constitution", "1951 Constitution", "1954 Constitution"], answer: "1954 Constitution" },
+
+  { question: "The primary function of the legislature is to:", options: ["interpret laws", "implement laws", "make laws", "execute judgments"], answer: "make laws" },
+  { question: "The separation of powers means:", options: ["the military is independent", "functions of government are divided", "power is held by one person", "there are no laws"], answer: "functions of government are divided" },
+  { question: "Which of the following is an example of a unitary system of government?", options: ["Nigeria", "Canada", "France", "United States"], answer: "France" },
+  { question: "The judiciary plays a vital role in a democracy by:", options: ["sponsoring political parties", "ensuring justice and interpreting laws", "drafting legislation", "monitoring elections"], answer: "ensuring justice and interpreting laws" },
+  { question: "A government in which all powers are concentrated in one central authority is called:", options: ["federalism", "unitary government", "confederation", "parliamentary system"], answer: "unitary government" },
+
+  { question: "A political ideology that promotes government ownership of production is:", options: ["capitalism", "socialism", "liberalism", "feudalism"], answer: "socialism" },
+  { question: "A dominant party system is one in which:", options: ["many parties exist", "opposition parties dominate", "one party wins repeatedly", "military rules"], answer: "one party wins repeatedly" },
+  { question: "Which of the following is a major feature of political parties?", options: ["To interpret laws", "To win elections", "To appoint judges", "To register voters"], answer: "To win elections" },
+  { question: "Multi-party systems encourage:", options: ["dictatorship", "choice and competition", "unitary government", "military rule"], answer: "choice and competition" },
+  { question: "Political parties differ from pressure groups mainly in their:", options: ["use of propaganda", "economic policies", "desire to capture power", "civil responsibilities"], answer: "desire to capture power" },
+
+  { question: "Which of the following is a pressure group?", options: ["Supreme Court", "Nigerian Army", "Nigerian Labour Congress", "PDP"], answer: "Nigerian Labour Congress" },
+  { question: "The media helps democracy by:", options: ["supporting only the ruling party", "spreading fake news", "promoting transparency", "increasing tension"], answer: "promoting transparency" },
+  { question: "Pressure groups differ from political parties because they:", options: ["contest elections", "form government", "influence policies", "control the military"], answer: "influence policies" },
+  { question: "Public opinion is best defined as:", options: ["the result of an election", "views of the police", "the collective views of the people", "opinions of government workers"], answer: "the collective views of the people" },
+  { question: "A trade union is a type of:", options: ["political party", "electoral body", "pressure group", "judiciary"], answer: "pressure group" },
+
+  { question: "Nigeria became a federation in:", options: ["1946", "1954", "1960", "1963"], answer: "1954" },
+  { question: "The first Nigerian Republic collapsed in:", options: ["1960", "1963", "1966", "1979"], answer: "1966" },
+  { question: "The major cause of the 1966 military coup was:", options: ["high taxation", "corruption and political crisis", "unemployment", "industrial strikes"], answer: "corruption and political crisis" },
+  { question: "The Biafra war lasted from:", options: ["1966–1967", "1967–1970", "1971–1973", "1975–1978"], answer: "1967–1970" },
+  { question: "Nigeria returned to democratic rule in:", options: ["1993", "1995", "1998", "1999"], answer: "1999" },
+
+  { question: "Indirect rule was popularized in Nigeria by:", options: ["Lord Lugard", "Zik", "Tafawa Balewa", "Mungo Park"], answer: "Lord Lugard" },
+  { question: "The 1922 Clifford Constitution introduced:", options: ["federalism", "regionalism", "elective principle", "indirect rule"], answer: "elective principle" },
+  { question: "The National Council of Nigeria and the Cameroons (NCNC) was formed in:", options: ["1923", "1944", "1951", "1960"], answer: "1944" },
+  { question: "A major weakness of indirect rule in Eastern Nigeria was:", options: ["lack of transport", "absence of centralized authority", "too many chiefs", "hostility of British"], answer: "absence of centralized authority" },
+  { question: "Which nationalist was the first president of Nigeria?", options: ["Nnamdi Azikiwe", "Tafawa Balewa", "Obafemi Awolowo", "Ahmadu Bello"], answer: "Nnamdi Azikiwe" },
+
+  { question: "The United Nations was established in:", options: ["1914", "1945", "1948", "1951"], answer: "1945" },
+  { question: "The main organ of the UN responsible for peace is:", options: ["General Assembly", "WHO", "Security Council", "UNESCO"], answer: "Security Council" },
+  { question: "ECOWAS stands for:", options: ["Economic Community of West African States", "Eastern Council of West African States", "Economic Coalition of West African Systems", "Economic Co-op of WA and SA"], answer: "Economic Community of West African States" },
+  { question: "The headquarters of the African Union is in:", options: ["Lagos", "Accra", "Nairobi", "Addis Ababa"], answer: "Addis Ababa" },
+  { question: "Nigeria joined the United Nations in:", options: ["1956", "1960", "1963", "1966"], answer: "1960" },
+
+  { question: "A Nigerian citizen by birth must have:", options: ["lived in Nigeria for 10 years", "paid taxes", "parents or grandparents born in Nigeria", "registered in a political party"], answer: "parents or grandparents born in Nigeria" },
+  { question: "Fundamental human rights are found in:", options: ["local government laws", "military decrees", "the constitution", "government white papers"], answer: "the constitution" },
+  { question: "A duty of a citizen includes:", options: ["making laws", "paying taxes", "controlling media", "declaring war"], answer: "paying taxes" },
+  { question: "The right to vote is an example of:", options: ["economic right", "civic responsibility", "political right", "judicial duty"], answer: "political right" },
+  { question: "Which of the following is not a fundamental right?", options: ["Right to education", "Right to life", "Right to join a party", "Right to traffic violations"], answer: "Right to traffic violations" },
+
+  { question: "The first military coup in Nigeria took place in:", options: ["1960", "1963", "1966", "1967"], answer: "1966" },
+  { question: "General Murtala Mohammed was assassinated in:", options: ["1974", "1975", "1976", "1979"], answer: "1976" },
+  { question: "Military rule is characterized by:", options: ["democratic elections", "court rulings", "decrees and edicts", "political debates"], answer: "decrees and edicts" },
+  { question: "The Second Republic began in:", options: ["1975", "1979", "1983", "1991"], answer: "1979" },
+  { question: "Which of the following was not a military head of state?", options: ["Yakubu Gowon", "Olusegun Obasanjo", "Ibrahim Babangida", "Nnamdi Azikiwe"], answer: "Nnamdi Azikiwe" },
+
+  { question: "INEC stands for:", options: ["International Election Commission", "Independent National Electoral Commission", "Internal Nigerian Election Council", "Independent Nigerian Electoral Committee"], answer: "Independent National Electoral Commission" },
+  { question: "Which of the following best describes universal adult suffrage?", options: ["Voting by only men", "Voting by civil servants", "Voting by all adults", "Voting by political party members"], answer: "Voting by all adults" },
+  { question: "The card reader was first used in Nigeria in:", options: ["2007", "2011", "2015", "2019"], answer: "2015" },
+  { question: "The body responsible for conducting elections in Nigeria is:", options: ["EFCC", "NJC", "INEC", "SSS"], answer: "INEC" },
+  { question: "Electoral malpractice is a challenge to democracy because it:", options: ["ensures fairness", "builds confidence", "causes voter apathy", "prevents violence"], answer: "causes voter apathy" }
+]
+,"CRS": [
+  
+  { question: "Who was the first king of Israel?", options: ["David", "Saul", "Solomon", "Samuel"], answer: "Saul" },
+  { question: "God's covenant with Abraham included the promise of:", options: ["rain and harvest", "kingship and prophecy", "land and descendants", "wealth and fame"], answer: "land and descendants" },
+  { question: "The Ten Commandments were given on:", options: ["Mount Horeb", "Mount Zion", "Mount Nebo", "Mount Sinai"], answer: "Mount Sinai" },
+  { question: "Who led the Israelites into the Promised Land?", options: ["Moses", "Aaron", "Joshua", "Samuel"], answer: "Joshua" },
+  { question: "Joseph's brothers sold him to the:", options: ["Egyptians", "Midianites", "Philistines", "Babylonians"], answer: "Midianites" },
+  { question: "David was chosen by God because he was:", options: ["tall and handsome", "rich and famous", "a man after God's heart", "the eldest son"], answer: "a man after God's heart" },
+  { question: "Elijah challenged the prophets of Baal at:", options: ["Mount Horeb", "Mount Sinai", "Mount Tabor", "Mount Carmel"], answer: "Mount Carmel" },
+  { question: "The purpose of the judges in Israel was to:", options: ["build the temple", "lead armies only", "settle disputes and lead", "serve as priests"], answer: "settle disputes and lead" },
+  { question: "The major sin of King Solomon was:", options: ["stealing", "idolatry", "murder", "lying"], answer: "idolatry" },
+  { question: "The fall of man occurred due to:", options: ["pride", "disobedience", "fear", "ignorance"], answer: "disobedience" },
+
+  
+  { question: "Jesus was baptized by:", options: ["Peter", "John the Baptist", "Paul", "James"], answer: "John the Baptist" },
+  { question: "The Beatitudes are part of the:", options: ["Lord’s Prayer", "Sermon on the Mount", "Parable of the Sower", "Last Supper"], answer: "Sermon on the Mount" },
+  { question: "Jesus turned water into wine at:", options: ["Jerusalem", "Nazareth", "Cana", "Bethany"], answer: "Cana" },
+  { question: "The greatest commandment, according to Jesus, is to:", options: ["love yourself", "love God and your neighbor", "obey your leaders", "fast and pray"], answer: "love God and your neighbor" },
+  { question: "The parable of the prodigal son teaches about:", options: ["honesty", "humility", "repentance and forgiveness", "hard work"], answer: "repentance and forgiveness" },
+  { question: "Jesus was tempted by the devil in the wilderness for:", options: ["3 days", "12 days", "21 days", "40 days"], answer: "40 days" },
+  { question: "The Last Supper took place during the:", options: ["Feast of Tabernacles", "Feast of Pentecost", "Passover", "Feast of Atonement"], answer: "Passover" },
+  { question: "Pontius Pilate was the:", options: ["Chief Priest", "King of Galilee", "Roman governor of Judea", "Disciple of Jesus"], answer: "Roman governor of Judea" },
+  { question: "Jesus rose from the dead on the:", options: ["first day", "second day", "third day", "fourth day"], answer: "third day" },
+  { question: "The first person to see Jesus after His resurrection was:", options: ["Peter", "Mary Magdalene", "Thomas", "Joseph of Arimathea"], answer: "Mary Magdalene" },
+
+  
+  { question: "The Pentecost occurred how many days after Jesus’ resurrection?", options: ["30", "40", "50", "10"], answer: "50" },
+  { question: "At Pentecost, the disciples received:", options: ["gifts of gold", "the Ten Commandments", "the Holy Spirit", "a new Bible"], answer: "the Holy Spirit" },
+  { question: "Saul became Paul after his conversion on the road to:", options: ["Jerusalem", "Galilee", "Damascus", "Nazareth"], answer: "Damascus" },
+  { question: "Stephen was the first:", options: ["Pope", "missionary", "martyr", "disciple"], answer: "martyr" },
+  { question: "Peter healed a lame man at the gate called:", options: ["Zion", "Beautiful", "Damascus", "Galilee"], answer: "Beautiful" },
+  { question: "Cornelius was the first:", options: ["Roman governor", "Jewish priest", "Gentile convert", "bishop"], answer: "Gentile convert" },
+  { question: "Paul and Silas were imprisoned in:", options: ["Ephesus", "Philippi", "Corinth", "Rome"], answer: "Philippi" },
+  { question: "Ananias and Sapphira died because they:", options: ["insulted the apostles", "stole from the poor", "lied to the Holy Spirit", "refused baptism"], answer: "lied to the Holy Spirit" },
+  { question: "The apostles appointed seven deacons to:", options: ["heal the sick", "preach only", "serve tables and help widows", "write the Gospels"], answer: "serve tables and help widows" },
+  { question: "Who replaced Judas Iscariot among the apostles?", options: ["Matthias", "Barnabas", "Timothy", "Silas"], answer: "Matthias" },
+
+  
+  { question: "The Christian teaching on love emphasizes:", options: ["giving to only friends", "loving those who love you", "loving enemies and neighbors", "avoiding strangers"], answer: "loving enemies and neighbors" },
+  { question: "Jesus taught forgiveness in the Lord’s Prayer as:", options: ["forgive only when asked", "forgive seven times", "forgive as we are forgiven", "forgive those we know"], answer: "forgive as we are forgiven" },
+  { question: "Honoring your father and mother is a commandment with:", options: ["no benefit", "a curse", "a promise", "a reward"], answer: "a promise" },
+  { question: "The fruit of the Spirit includes:", options: ["hatred", "love", "laziness", "revenge"], answer: "love" },
+  { question: "Christian humility is best shown by:", options: ["commanding others", "serving others", "showing pride", "seeking status"], answer: "serving others" },
+  { question: "The Good Samaritan showed:", options: ["anger", "compassion", "jealousy", "pride"], answer: "compassion" },
+  { question: "Christians are called to be the:", options: ["light and salt of the world", "kings of nations", "enemies of sinners", "judges of others"], answer: "light and salt of the world" },
+  { question: "The greatest among you must be:", options: ["the loudest", "the strongest", "your servant", "your teacher"], answer: "your servant" },
+  { question: "Paul taught that salvation comes through:", options: ["good works", "the law", "faith in Christ", "obeying men"], answer: "faith in Christ" },
+  { question: "The wages of sin is:", options: ["blessing", "death", "sickness", "trouble"], answer: "death" },
+
+ 
+  { question: "God created the world in how many days?", options: ["5", "6", "7", "8"], answer: "6" },
+  { question: "The Bible is divided into:", options: ["5 books", "2 testaments", "3 parts", "4 gospels only"], answer: "2 testaments" },
+  { question: "The Bible was written by:", options: ["angels", "prophets and apostles", "kings only", "Moses alone"], answer: "prophets and apostles" },
+  { question: "The longest chapter in the Bible is:", options: ["Psalm 1", "Psalm 119", "Psalm 23", "Psalm 91"], answer: "Psalm 119" },
+  { question: "The shortest verse in the Bible is:", options: ["Jesus forgave them", "Jesus wept", "Jesus prayed", "Jesus taught"], answer: "Jesus wept" },
+  { question: "The book of Revelation was written by:", options: ["Peter", "John", "James", "Paul"], answer: "John" },
+  { question: "Faith is the substance of things:", options: ["felt and seen", "feared and doubted", "hoped for and unseen", "heard and understood"], answer: "hoped for and unseen" },
+  { question: "God called Moses through a:", options: ["vision at night", "dream", "burning bush", "lightning storm"], answer: "burning bush" },
+  { question: "The Holy Spirit came in the form of:", options: ["a dove", "fire and wind", "a cloud", "water"], answer: "fire and wind" },
+  { question: "Christians are expected to pray:", options: ["only in church", "once a week", "without ceasing", "only when in trouble"], answer: "without ceasing" }
+]
+,"Literature" : [
+  {
+    question: "The term 'tragic flaw' refers to:",
+    options: ["The setting of a story", "A hero’s weakness that leads to downfall", "An irrelevant event", "The end of a plot"],
+    answer: "A hero’s weakness that leads to downfall"
+  },
+  {
+    question: "A figure of speech that makes a comparison using 'like' or 'as' is:",
+    options: ["Metaphor", "Irony", "Simile", "Alliteration"],
+    answer: "Simile"
+  },
+  {
+    question: "Which of the following genres is written in verse and meant to be performed?",
+    options: ["Novel", "Drama", "Poetry", "Prose"],
+    answer: "Drama"
+  },
+  {
+    question: "A sonnet has how many lines?",
+    options: ["10", "12", "14", "16"],
+    answer: "14"
+  },
+  {
+    question: "A play on words is known as:",
+    options: ["Hyperbole", "Pun", "Paradox", "Satire"],
+    answer: "Pun"
+  },
+  {
+    question: "The major character in a story is called:",
+    options: ["Antagonist", "Protagonist", "Narrator", "Actor"],
+    answer: "Protagonist"
+  },
+  {
+    question: "Which of these is not a form of poetry?",
+    options: ["Ode", "Elegy", "Ballad", "Fiction"],
+    answer: "Fiction"
+  },
+  {
+    question: "A story that teaches a moral lesson is called:",
+    options: ["Fiction", "Drama", "Parable", "Epic"],
+    answer: "Parable"
+  },
+  {
+    question: "A farce is a type of:",
+    options: ["Serious play", "Tragic drama", "Satirical comedy", "Romantic poem"],
+    answer: "Satirical comedy"
+  },
+  {
+    question: "The repetition of consonant sounds at the beginning of words is:",
+    options: ["Rhyme", "Irony", "Alliteration", "Metaphor"],
+    answer: "Alliteration"
+  },
+  {
+    question: "Which of the following is an example of a dramatic monologue?",
+    options: ["Soliloquy", "Dialogue", "Chorus", "Aside"],
+    answer: "Soliloquy"
+  },
+  {
+    question: "The climax in a plot refers to:",
+    options: ["Beginning of a story", "Most intense point", "Story’s end", "Character’s introduction"],
+    answer: "Most intense point"
+  },
+  {
+    question: "A poem mourning the death of someone is called:",
+    options: ["Ode", "Elegy", "Lyric", "Epic"],
+    answer: "Elegy"
+  },
+  {
+    question: "Which of these is associated with Wole Soyinka?",
+    options: ["Things Fall Apart", "The Lion and the Jewel", "The Passport of Mallam Ilia", "Jagua Nana"],
+    answer: "The Lion and the Jewel"
+  },
+  {
+    question: "The writer's attitude towards the subject in a literary work is called:",
+    options: ["Theme", "Mood", "Tone", "Setting"],
+    answer: "Tone"
+  },
+  {
+    question: "The dictionary meaning of a word is called its:",
+    options: ["Connotation", "Denotation", "Syntax", "Context"],
+    answer: "Denotation"
+  },
+  {
+    question: "A character who changes during the course of a story is called:",
+    options: ["Flat character", "Round character", "Static character", "Minor character"],
+    answer: "Round character"
+  },
+  {
+    question: "A story told to explain a natural phenomenon is a:",
+    options: ["Myth", "Fable", "Satire", "Biography"],
+    answer: "Myth"
+  },
+  {
+    question: "Which of these is not a theme in literature?",
+    options: ["Love", "Betrayal", "Comedy", "War"],
+    answer: "Comedy"
+  },
+  {
+    question: "The perspective from which a story is told is its:",
+    options: ["Narrator", "Point of view", "Setting", "Conflict"],
+    answer: "Point of view"
+  },
+  {
+    question: "An exaggerated statement not meant to be taken literally is:",
+    options: ["Paradox", "Hyperbole", "Irony", "Simile"],
+    answer: "Hyperbole"
+  },
+  {
+    question: "A poetic device that gives human qualities to non-living things is:",
+    options: ["Metaphor", "Oxymoron", "Personification", "Symbolism"],
+    answer: "Personification"
+  },
+  {
+    question: "Who wrote 'Things Fall Apart'?",
+    options: ["Chinua Achebe", "Wole Soyinka", "Ngugi wa Thiong’o", "Ben Okri"],
+    answer: "Chinua Achebe"
+  },
+  {
+    question: "In drama, a remark made by a character that is heard by the audience but not by other characters is called:",
+    options: ["Dialogue", "Aside", "Monologue", "Soliloquy"],
+    answer: "Aside"
+  },
+  {
+    question: "The struggle between opposing forces in a story is the:",
+    options: ["Theme", "Plot", "Conflict", "Tone"],
+    answer: "Conflict"
+  },
+  {
+    question: "The use of 'he', 'she', or 'they' in narration suggests:",
+    options: ["First person", "Second person", "Third person", "Omniscient"],
+    answer: "Third person"
+  },
+  {
+    question: "An autobiographical story is one that is:",
+    options: ["Fictional", "Written by someone else", "Written by the subject", "An ancient myth"],
+    answer: "Written by the subject"
+  },
+  {
+    question: "Symbolism in literature is used to:",
+    options: ["Describe characters", "Represent deeper meanings", "Set the scene", "Explain grammar"],
+    answer: "Represent deeper meanings"
+  },
+  {
+    question: "What does 'genre' refer to?",
+    options: ["The mood of a text", "The type of literary work", "The plot structure", "The ending"],
+    answer: "The type of literary work"
+  },
+  {
+    question: "Who is the antagonist in a story?",
+    options: ["The narrator", "The comic relief", "The main character", "The character in conflict with the protagonist"],
+    answer: "The character in conflict with the protagonist"
+  },
+  {
+    question: "A 'foil' character is used to:",
+    options: ["Foil the plot", "Confuse the reader", "Contrast the protagonist", "Be the narrator"],
+    answer: "Contrast the protagonist"
+  },
+  {
+    question: "A play written to be read rather than performed is called a:",
+    options: ["Drama", "Closet drama", "Tragedy", "Comedy"],
+    answer: "Closet drama"
+  },
+  {
+    question: "Who is the author of 'Jagua Nana'?",
+    options: ["Cyprian Ekwensi", "Chinua Achebe", "Wole Soyinka", "Ben Okri"],
+    answer: "Cyprian Ekwensi"
+  },
+  {
+    question: "A long narrative poem about heroic deeds is called:",
+    options: ["Lyric", "Ballad", "Epic", "Elegy"],
+    answer: "Epic"
+  },
+  {
+    question: "Satire is best defined as:",
+    options: ["A form of praise", "A way to promote violence", "Use of humor to criticize", "A romantic tale"],
+    answer: "Use of humor to criticize"
+  },
+  {
+    question: "The setting of a story refers to its:",
+    options: ["Climax", "Time and place", "Conflict", "Theme"],
+    answer: "Time and place"
+  },
+  {
+    question: "Which of these is NOT a type of conflict?",
+    options: ["Man vs Man", "Man vs Self", "Man vs Money", "Man vs Nature"],
+    answer: "Man vs Money"
+  },
+  {
+    question: "The narrator of a story is called the:",
+    options: ["Author", "Character", "Speaker", "Narrator"],
+    answer: "Narrator"
+  },
+  {
+    question: "In a novel, 'foreshadowing' means:",
+    options: ["Predicting future sales", "Hinting at events to come", "Revealing the theme", "Introducing a villain"],
+    answer: "Hinting at events to come"
+  },
+  {
+    question: "A comedy is a play that usually ends in:",
+    options: ["Death", "Conflict", "Tragedy", "Happiness"],
+    answer: "Happiness"
+  },
+  {
+    question: "Who is the author of 'The African Child'?",
+    options: ["Camara Laye", "Sembene Ousmane", "Wole Soyinka", "Nadine Gordimer"],
+    answer: "Camara Laye"
+  },
+  {
+    question: "A novel is best defined as:",
+    options: ["A short poem", "A long narrative work of fiction", "An epic drama", "An ancient manuscript"],
+    answer: "A long narrative work of fiction"
+  },
+  {
+    question: "Which of the following is NOT a literary device?",
+    options: ["Irony", "Metaphor", "Rhythm", "Grammar"],
+    answer: "Grammar"
+  },
+  {
+    question: "The opposite of 'literal' meaning is:",
+    options: ["True", "Figurative", "Exact", "Obvious"],
+    answer: "Figurative"
+  },
+  {
+    question: "Who is the protagonist in 'The Lion and the Jewel'?",
+    options: ["Baroka", "Sidi", "Lakunle", "Sadiku"],
+    answer: "Sidi"
+  },
+  {
+    question: "Which of these best describes a ‘theme’?",
+    options: ["The writer’s name", "The lesson or message", "The structure of the text", "The setting details"],
+    answer: "The lesson or message"
+  },
+  {
+    question: "A flashback is used in a story to:",
+    options: ["Show the climax", "Add suspense", "Reveal a past event", "Describe a setting"],
+    answer: "Reveal a past event"
+  },
+  {
+    question: "Which of these is a type of irony?",
+    options: ["Dramatic", "Narrative", "Character", "Setting"],
+    answer: "Dramatic"
+  },
+  {
+    question: "A character with only one trait is called a:",
+    options: ["Dynamic character", "Round character", "Flat character", "Major character"],
+    answer: "Flat character"
+  },
+  {
+    question: "A dialogue involves:",
+    options: ["One person", "Only the narrator", "Two or more characters speaking", "The author’s comment"],
+    answer: "Two or more characters speaking"
+  }
+]
+,"Mathematics" : [
+  { question: "Convert 0.375 to a fraction.", options: ["⅜", "¾", "⅖", "⅚"], answer: "⅜" },
+  { question: "Express 64 as a product of its prime factors.", options: ["2 × 2 × 2 × 2", "2⁶", "4³", "8 × 8"], answer: "2⁶" },
+  { question: "The LCM of 12, 15 and 20 is:", options: ["60", "180", "120", "240"], answer: "120" },
+  { question: "If x% of 400 is 48, what is x?", options: ["12", "15", "18", "20"], answer: "20" },
+  { question: "Convert 110101₂ to decimal.", options: ["53", "52", "55", "45"], answer: "53" },
+
+  { question: "Solve for x: 2x – 3 = 5", options: ["1", "2", "4", "6"], answer: "4" },
+  { question: "Factorize: x² – 9", options: ["(x – 3)(x + 3)", "(x – 9)(x + 1)", "(x – 1)(x + 9)", "(x – 3)²"], answer: "(x – 3)(x + 3)" },
+  { question: "Simplify: (2x + 3)(x – 4)", options: ["2x² – 5x – 12", "2x² – 5x + 12", "2x² + 3x – 12", "x² – 8x + 3"], answer: "2x² – 5x – 12" },
+  { question: "If x² = 81, what are the values of x?", options: ["9", "±9", "–9", "0"], answer: "±9" },
+  { question: "Simplify: 4a – 2(3a – 5)", options: ["–2a – 10", "–2a + 10", "10 – 2a", "2a + 10"], answer: "–2a + 10" },
+
+  { question: "A triangle with sides 5 cm, 12 cm, and 13 cm is:", options: ["equilateral", "right-angled", "isosceles", "scalene"], answer: "right-angled" },
+  { question: "The sum of angles in a pentagon is:", options: ["360°", "540°", "720°", "900°"], answer: "540°" },
+  { question: "The value of sin 30° is:", options: ["1", "0.866", "0.5", "0"], answer: "0.5" },
+  { question: "In a triangle, if angle A = 60°, angle B = 80°, then angle C = ?", options: ["30°", "40°", "20°", "50°"], answer: "40°" },
+  { question: "In a circle, the angle subtended by a diameter at the circumference is:", options: ["180°", "60°", "90°", "45°"], answer: "90°" },
+
+  { question: "The area of a trapezium with parallel sides 8 cm and 6 cm and height 5 cm is:", options: ["30 cm²", "35 cm²", "40 cm²", "50 cm²"], answer: "40 cm²" },
+  { question: "The volume of a cube with side 4 cm is:", options: ["64 cm³", "16 cm³", "32 cm³", "256 cm³"], answer: "64 cm³" },
+  { question: "Find the area of a circle with radius 7 cm. (Take π = 22/7)", options: ["49 cm²", "154 cm²", "44 cm²", "100 cm²"], answer: "154 cm²" },
+  { question: "The surface area of a cube of side 3 cm is:", options: ["54 cm²", "27 cm²", "36 cm²", "72 cm²"], answer: "54 cm²" },
+  { question: "Volume of a cylinder = πr²h. Find the volume when r = 3 cm and h = 10 cm.", options: ["90π cm³", "100π cm³", "120π cm³", "270π cm³"], answer: "270π cm³" },
+
+  { question: "Find the mean of 3, 5, 7, 9, 11.", options: ["7", "9", "6", "8"], answer: "7" },
+  { question: "The median of 4, 8, 6, 2, 10 is:", options: ["6", "5", "7", "4"], answer: "6" },
+  { question: "Mode of 5, 7, 5, 8, 9, 5, 10 is:", options: ["7", "8", "5", "10"], answer: "5" },
+  { question: "If a fair die is tossed once, the probability of getting an even number is:", options: ["1/6", "1/3", "1/2", "2/3"], answer: "1/2" },
+  { question: "What is the range of 12, 16, 18, 25, 10?", options: ["13", "15", "10", "12"], answer: "15" },
+
+  { question: "If y = x² + 2x, find dy/dx.", options: ["2x + 2", "2x", "x²", "x + 2"], answer: "2x + 2" },
+  { question: "Find the derivative of y = 3x³.", options: ["6x", "9x²", "x³", "3x²"], answer: "9x²" },
+  { question: "If y = sin x, dy/dx = ?", options: ["cos x", "sin x", "–sin x", "–cos x"], answer: "cos x" },
+  { question: "Integrate: ∫3x² dx", options: ["x³", "x²", "x³ + C", "x² + C"], answer: "x³ + C" },
+  { question: "Find ∫6 dx", options: ["6", "6x", "x", "3x"], answer: "6x" },
+
+  { question: "If A = {1,2,3} and B = {2,3,4}, then A ∪ B =", options: ["{1,2,3,4}", "{2,3}", "{1,4}", "{1,2,3}"], answer: "{1,2,3,4}" },
+  { question: "A ∩ B for A = {1,2,5}, B = {2,4,5} is:", options: ["{1,2,4}", "{2,5}", "{5,1}", "{2,4}"], answer: "{2,5}" },
+  { question: "The universal set contains:", options: ["all elements in the subsets", "only one subset", "only empty set", "only odd numbers"], answer: "all elements in the subsets" },
+  { question: "The contrapositive of “If it rains, then I will sleep” is:", options: ["If I sleep, then it rains", "If it does not rain, I will not sleep", "If I do not sleep, then it does not rain", "If I do not sleep, it must rain"], answer: "If I do not sleep, then it does not rain" },
+  { question: "The truth table for “p ∧ q” is false when:", options: ["p is true, q is false", "both are true", "both are false", "p is false, q is true"], answer: "p is true, q is false" },
+
+  { question: "The graph of y = x² is:", options: ["a straight line", "a parabola", "a circle", "a triangle"], answer: "a parabola" },
+  { question: "The gradient of the line y = 2x + 3 is:", options: ["3", "2", "1", "–2"], answer: "2" },
+  { question: "The slope of a horizontal line is:", options: ["0", "1", "undefined", "infinite"], answer: "0" },
+  { question: "Solve: If f(x) = x² + 1, find f(3)", options: ["10", "9", "12", "11"], answer: "10" },
+  { question: "The x-intercept of y = 2x – 4 is:", options: ["0", "2", "–2", "4"], answer: "2" },
+
+  { question: "A man bought a phone for ₦50,000 and sold it for ₦60,000. Find the percentage profit.", options: ["20%", "25%", "10%", "15%"], answer: "20%" },
+  { question: "If 3 men can complete a job in 4 days, how many days will 6 men take?", options: ["2", "4", "6", "1"], answer: "2" },
+  { question: "A car travels 150 km in 3 hours. Find its average speed.", options: ["30 km/h", "50 km/h", "60 km/h", "45 km/h"], answer: "50 km/h" },
+  { question: "Find simple interest on ₦5,000 for 3 years at 5% p.a.", options: ["₦500", "₦750", "₦1,000", "₦1,500"], answer: "₦750" },
+  { question: "Convert 3 hours 45 minutes to minutes.", options: ["215", "225", "205", "195"], answer: "225" },
+
+  { question: "What is the square root of 625?", options: ["25", "20", "15", "30"], answer: "25" },
+  { question: "Find the cube of 4.", options: ["8", "12", "64", "16"], answer: "64" },
+  { question: "A rectangle has length 8 cm and width 3 cm. Its perimeter is:", options: ["24 cm", "22 cm", "30 cm", "16 cm"], answer: "22 cm" },
+  { question: "A bag contains 3 red, 5 blue, and 2 green balls. What's the probability of picking a blue ball?", options: ["1/5", "1/2", "1/10", "1/4"], answer: "1/2" },
+  { question: "A clock shows 3:00. What is the angle between the hour and minute hands?", options: ["60°", "90°", "45°", "75°"], answer: "90°" }
+]
+,"Biology": [
+  {
+    question: "The basic structural and functional unit of life is the:",
+    options: ["Tissue", "Cell", "Organ", "Organelle"],
+    answer: "Cell"
+  },
+  {
+    question: "Which organelle is responsible for energy production?",
+    options: ["Ribosome", "Mitochondrion", "Nucleus", "Endoplasmic reticulum"],
+    answer: "Mitochondrion"
+  },
+  {
+    question: "A plant cell differs from an animal cell because it has:",
+    options: ["Nucleus", "Cytoplasm", "Cell wall", "Ribosome"],
+    answer: "Cell wall"
+  },
+  {
+    question: "Which of the following is not a component of the cell membrane?",
+    options: ["Protein", "Lipid", "Carbohydrate", "Cellulose"],
+    answer: "Cellulose"
+  },
+  {
+    question: "The cell theory was proposed by:",
+    options: ["Charles Darwin", "Schleiden and Schwann", "Gregor Mendel", "Louis Pasteur"],
+    answer: "Schleiden and Schwann"
+  },
+  {
+    question: "A gene is:",
+    options: ["A part of a chromosome that codes for a protein", "A blood group", "A type of protein", "An organelle"],
+    answer: "A part of a chromosome that codes for a protein"
+  },
+  {
+    question: "What is the genotype of a person with blood group AB?",
+    options: ["AA", "BB", "AB", "OO"],
+    answer: "AB"
+  },
+  {
+    question: "Mendel’s first law is the law of:",
+    options: ["Mutation", "Independent assortment", "Segregation", "Linkage"],
+    answer: "Segregation"
+  },
+  {
+    question: "Which of these is a sex-linked trait?",
+    options: ["Tongue rolling", "Baldness", "Albinism", "Colour blindness"],
+    answer: "Colour blindness"
+  },
+  {
+    question: "The pairing of nitrogenous bases in DNA is:",
+    options: ["A–G and T–C", "A–T and G–C", "A–U and G–C", "A–C and G–T"],
+    answer: "A–T and G–C"
+  },
+  {
+    question: "Which nutrient is mainly used for energy in the body?",
+    options: ["Protein", "Lipid", "Carbohydrate", "Vitamin"],
+    answer: "Carbohydrate"
+  },
+  {
+    question: "Which organ is involved in digestion but not in absorption?",
+    options: ["Small intestine", "Large intestine", "Stomach", "Pancreas"],
+    answer: "Stomach"
+  },
+  {
+    question: "What is the end product of aerobic respiration?",
+    options: ["Oxygen", "Water and carbon dioxide", "Alcohol and carbon dioxide", "Lactic acid"],
+    answer: "Water and carbon dioxide"
+  },
+  {
+    question: "The organ responsible for gas exchange in humans is the:",
+    options: ["Heart", "Kidney", "Liver", "Lung"],
+    answer: "Lung"
+  },
+  {
+    question: "The main function of enzymes is to:",
+    options: ["Store energy", "Transport oxygen", "Speed up reactions", "Destroy pathogens"],
+    answer: "Speed up reactions"
+  },
+  {
+    question: "The term “biotic factors” refers to:",
+    options: ["Non-living things", "Living organisms", "Temperature and light", "Soil and water"],
+    answer: "Living organisms"
+  },
+  {
+    question: "A group of the same species living in an area is a:",
+    options: ["Community", "Population", "Ecosystem", "Habitat"],
+    answer: "Population"
+  },
+  {
+    question: "The natural home of an organism is its:",
+    options: ["Habitat", "Niche", "Territory", "Environment"],
+    answer: "Habitat"
+  },
+  {
+    question: "The lowest level of ecological organization is:",
+    options: ["Population", "Organism", "Community", "Ecosystem"],
+    answer: "Organism"
+  },
+  {
+    question: "What is the major cause of ozone layer depletion?",
+    options: ["Carbon dioxide", "Nitrogen oxides", "CFCs", "Sulphur dioxide"],
+    answer: "CFCs"
+  },
+  {
+    question: "Evolution is best defined as:",
+    options: ["Change in size of animals", "Descent with modification", "Migration of organisms", "Formation of fossils"],
+    answer: "Descent with modification"
+  },
+  {
+    question: "Charles Darwin proposed the theory of:",
+    options: ["Cell theory", "Natural selection", "Inheritance", "Biogenesis"],
+    answer: "Natural selection"
+  },
+  {
+    question: "Which of these is a vestigial structure in humans?",
+    options: ["Eyes", "Arms", "Appendix", "Kidney"],
+    answer: "Appendix"
+  },
+  {
+    question: "Fossils are preserved remains of:",
+    options: ["Living animals", "Extinct organisms", "Rocks", "Plants only"],
+    answer: "Extinct organisms"
+  },
+  {
+    question: "Which of the following is an example of adaptive coloration?",
+    options: ["Camouflage", "Hibernation", "Migration", "Mimicry"],
+    answer: "Camouflage"
+  },
+  {
+    question: "Asexual reproduction involves:",
+    options: ["Union of gametes", "Two parents", "Genetic variation", "One parent"],
+    answer: "One parent"
+  },
+  {
+    question: "Which of the following reproduces asexually?",
+    options: ["Dog", "Bacteria", "Bird", "Fish"],
+    answer: "Bacteria"
+  },
+  {
+    question: "The fusion of male and female gametes is called:",
+    options: ["Fertilization", "Pollination", "Germination", "Division"],
+    answer: "Fertilization"
+  },
+  {
+    question: "Where does fertilization occur in humans?",
+    options: ["Uterus", "Ovary", "Fallopian tube", "Cervix"],
+    answer: "Fallopian tube"
+  },
+  {
+    question: "Which hormone triggers ovulation?",
+    options: ["Estrogen", "Progesterone", "LH", "FSH"],
+    answer: "LH"
+  },
+  {
+    question: "Binomial nomenclature was introduced by:",
+    options: ["Darwin", "Linnaeus", "Pasteur", "Lamarck"],
+    answer: "Linnaeus"
+  },
+  {
+    question: "The scientific name of man is:",
+    options: ["Homo erectus", "Homo habilis", "Homo sapiens", "Primates sapiens"],
+    answer: "Homo sapiens"
+  },
+  {
+    question: "Which kingdom contains multicellular autotrophs?",
+    options: ["Animalia", "Fungi", "Plantae", "Monera"],
+    answer: "Plantae"
+  },
+  {
+    question: "Which of the following is not an invertebrate?",
+    options: ["Snail", "Earthworm", "Lizard", "Spider"],
+    answer: "Lizard"
+  },
+  {
+    question: "Vertebrates are animals that:",
+    options: ["Have jointed legs", "Have scales", "Have backbones", "Have fur"],
+    answer: "Have backbones"
+  },
+  {
+    question: "The blood vessel that carries oxygenated blood from lungs to the heart is the:",
+    options: ["Pulmonary artery", "Aorta", "Pulmonary vein", "Vena cava"],
+    answer: "Pulmonary vein"
+  },
+  {
+    question: "Which part of the brain controls balance?",
+    options: ["Cerebrum", "Medulla", "Cerebellum", "Spinal cord"],
+    answer: "Cerebellum"
+  },
+  {
+    question: "The hormone that regulates blood sugar level is:",
+    options: ["Adrenaline", "Insulin", "Thyroxine", "Testosterone"],
+    answer: "Insulin"
+  },
+  {
+    question: "The main excretory organ in humans is the:",
+    options: ["Liver", "Lung", "Skin", "Kidney"],
+    answer: "Kidney"
+  },
+  {
+    question: "Which part of a plant absorbs water?",
+    options: ["Leaf", "Root", "Stem", "Flower"],
+    answer: "Root"
+  },
+  {
+    question: "The causative organism of malaria is:",
+    options: ["Bacteria", "Plasmodium", "Virus", "Protozoa"],
+    answer: "Plasmodium"
+  },
+  {
+    question: "Which disease is caused by lack of vitamin C?",
+    options: ["Rickets", "Beriberi", "Pellagra", "Scurvy"],
+    answer: "Scurvy"
+  },
+  {
+    question: "HIV affects which system of the body?",
+    options: ["Digestive", "Nervous", "Immune", "Skeletal"],
+    answer: "Immune"
+  },
+  {
+    question: "A vaccine provides:",
+    options: ["Cure for diseases", "Natural resistance", "Active immunity", "Passive immunity"],
+    answer: "Active immunity"
+  },
+  {
+    question: "Which of the following is a genetic disorder?",
+    options: ["Influenza", "Measles", "Sickle-cell anaemia", "Malaria"],
+    answer: "Sickle-cell anaemia"
+  },
+  {
+    question: "The xylem transports:",
+    options: ["Food", "Water", "Hormones", "Minerals only"],
+    answer: "Water"
+  },
+  {
+    question: "Which of the following is an example of a parasitic plant?",
+    options: ["Moss", "Lichen", "Mistletoe", "Fern"],
+    answer: "Mistletoe"
+  },
+  {
+    question: "Tropism in plants is a response to:",
+    options: ["Hormones", "Growth", "Stimuli", "Water only"],
+    answer: "Stimuli"
+  },
+  {
+    question: "Which blood component helps in clotting?",
+    options: ["Red cells", "White cells", "Platelets", "Plasma"],
+    answer: "Platelets"
+  },
+  {
+    question: "Which of the following is not a function of the skeleton?",
+    options: ["Support", "Movement", "Digestion", "Protection"],
+    answer: "Digestion"
+  }
+]
+,"Physics": [
+  {
+    question: "Which of the following is a derived unit?",
+    options: ["Kilogram", "Ampere", "Metre", "Newton"],
+    answer: "Newton"
+  },
+  {
+    question: "The instrument used to measure diameter of a wire accurately is:",
+    options: ["Meter rule", "Vernier caliper", "Micrometer screw gauge", "Tape rule"],
+    answer: "Micrometer screw gauge"
+  },
+  {
+    question: "The S.I. unit of pressure is:",
+    options: ["Pascal", "Newton", "Joule", "Watt"],
+    answer: "Pascal"
+  },
+  {
+    question: "Which quantity is dimensionless?",
+    options: ["Acceleration", "Refractive index", "Work", "Force"],
+    answer: "Refractive index"
+  },
+  {
+    question: "A vector quantity has both:",
+    options: ["Time and direction", "Magnitude and direction", "Speed and distance", "Mass and volume"],
+    answer: "Magnitude and direction"
+  },
+  {
+    question: "A body moving in a straight line covers 20 m in 4 s. Its speed is:",
+    options: ["5 m/s", "80 m/s", "4 m/s", "0.2 m/s"],
+    answer: "5 m/s"
+  },
+  {
+    question: "The acceleration due to gravity on Earth is approximately:",
+    options: ["8.0 m/s²", "9.8 m/s²", "10.5 m/s²", "6.5 m/s²"],
+    answer: "9.8 m/s²"
+  },
+  {
+    question: "A body remains at rest unless acted upon by a force. This is:",
+    options: ["Newton’s 2nd Law", "Newton’s 3rd Law", "Newton’s 1st Law", "Law of conservation of energy"],
+    answer: "Newton’s 1st Law"
+  },
+  {
+    question: "A man weighing 600 N stands on a scale in an elevator moving downward with acceleration. The scale reading is:",
+    options: ["More than 600 N", "Equal to 600 N", "Less than 600 N", "Zero"],
+    answer: "Less than 600 N"
+  },
+  {
+    question: "A couple produces:",
+    options: ["Linear motion", "Translational equilibrium", "Rotational effect", "Change in mass"],
+    answer: "Rotational effect"
+  },
+  {
+    question: "Work is defined as:",
+    options: ["Force × distance", "Mass × acceleration", "Energy × time", "Power × time"],
+    answer: "Force × distance"
+  },
+  {
+    question: "A 2 kg object is lifted to a height of 5 m. (g = 10 m/s²). The potential energy gained is:",
+    options: ["100 J", "10 J", "20 J", "5 J"],
+    answer: "100 J"
+  },
+  {
+    question: "Power is the:",
+    options: ["Force per unit distance", "Energy used per unit time", "Mass per volume", "Distance covered per unit time"],
+    answer: "Energy used per unit time"
+  },
+  {
+    question: "The energy possessed by a moving object is:",
+    options: ["Potential energy", "Electrical energy", "Kinetic energy", "Chemical energy"],
+    answer: "Kinetic energy"
+  },
+  {
+    question: "The efficiency of a machine is calculated as:",
+    options: ["Work output / Work input × 100", "Work input / Work output × 100", "Force / Distance", "Power × Time"],
+    answer: "Work output / Work input × 100"
+  },
+  {
+    question: "Which of the following is a good conductor of heat?",
+    options: ["Glass", "Plastic", "Wood", "Copper"],
+    answer: "Copper"
+  },
+  {
+    question: "The S.I. unit of heat is:",
+    options: ["Kelvin", "Newton", "Calorie", "Joule"],
+    answer: "Joule"
+  },
+  {
+    question: "Heat transfer by convection occurs mostly in:",
+    options: ["Solids", "Liquids and gases", "Vacuum", "Metals"],
+    answer: "Liquids and gases"
+  },
+  {
+    question: "The fixed points on the Celsius scale are:",
+    options: ["0°C and 100°C", "273K and 373K", "32°F and 212°F", "10°C and 90°C"],
+    answer: "0°C and 100°C"
+  },
+  {
+    question: "The change of a solid directly into gas is known as:",
+    options: ["Condensation", "Evaporation", "Sublimation", "Boiling"],
+    answer: "Sublimation"
+  },
+  {
+    question: "A wave that needs a medium to travel is:",
+    options: ["Electromagnetic wave", "Transverse wave", "Mechanical wave", "X-ray"],
+    answer: "Mechanical wave"
+  },
+  {
+    question: "The distance between two consecutive crests is called:",
+    options: ["Frequency", "Period", "Wavelength", "Amplitude"],
+    answer: "Wavelength"
+  },
+  {
+    question: "The unit of frequency is:",
+    options: ["Second", "Hertz", "Meter", "Decibel"],
+    answer: "Hertz"
+  },
+  {
+    question: "Sound cannot travel through:",
+    options: ["Air", "Steel", "Water", "Vacuum"],
+    answer: "Vacuum"
+  },
+  {
+    question: "The pitch of a sound is determined by its:",
+    options: ["Wavelength", "Frequency", "Speed", "Amplitude"],
+    answer: "Frequency"
+  },
+  {
+    question: "A plane mirror always produces:",
+    options: ["Real and inverted image", "Virtual and upright image", "Diminished image", "Magnified image"],
+    answer: "Virtual and upright image"
+  },
+  {
+    question: "The bending of light as it passes from one medium to another is:",
+    options: ["Reflection", "Refraction", "Dispersion", "Diffraction"],
+    answer: "Refraction"
+  },
+  {
+    question: "Total internal reflection occurs when light moves from:",
+    options: ["Glass to air", "Air to glass", "Vacuum to air", "Water to glass"],
+    answer: "Glass to air"
+  },
+  {
+    question: "A convex lens can be used to correct:",
+    options: ["Short sight", "Long sight", "Astigmatism", "Blindness"],
+    answer: "Long sight"
+  },
+  {
+    question: "The unit of refractive index is:",
+    options: ["m/s", "m", "No unit", "Hz"],
+    answer: "No unit"
+  },
+  {
+    question: "The S.I. unit of electric current is:",
+    options: ["Ohm", "Volt", "Ampere", "Coulomb"],
+    answer: "Ampere"
+  },
+  {
+    question: "Ohm’s law states that:",
+    options: ["V = IR", "V = I + R", "P = IV", "R = VI"],
+    answer: "V = IR"
+  },
+  {
+    question: "A material that allows electrons to flow freely is called:",
+    options: ["Insulator", "Resistor", "Conductor", "Semiconductor"],
+    answer: "Conductor"
+  },
+  {
+    question: "The S.I. unit of resistance is:",
+    options: ["Watt", "Ohm", "Coulomb", "Volt"],
+    answer: "Ohm"
+  },
+  {
+    question: "A device used to store electrical energy is:",
+    options: ["Transformer", "Resistor", "Capacitor", "Switch"],
+    answer: "Capacitor"
+  },
+  {
+    question: "The energy in a nuclear reaction is due to:",
+    options: ["Heat", "Mass change", "Friction", "Electric field"],
+    answer: "Mass change"
+  },
+  {
+    question: "Radioactivity is the:",
+    options: ["Emission of electromagnetic waves", "Emission of charged particles from unstable nuclei", "Absorption of light", "Transmission of sound"],
+    answer: "Emission of charged particles from unstable nuclei"
+  },
+  {
+    question: "The unit of radioactivity is:",
+    options: ["Volt", "Sievert", "Hertz", "Becquerel"],
+    answer: "Becquerel"
+  },
+  {
+    question: "Isotopes are atoms of the same element with:",
+    options: ["Same mass, different protons", "Same protons, different neutrons", "Different electrons", "Same size"],
+    answer: "Same protons, different neutrons"
+  },
+  {
+    question: "The half-life of a radioactive element is:",
+    options: ["Time it takes to double in mass", "Time it takes for half the atoms to decay", "Time for atoms to vanish", "Time to absorb radiation"],
+    answer: "Time it takes for half the atoms to decay"
+  },
+  {
+    question: "A diode allows current to flow in:",
+    options: ["Both directions", "No direction", "One direction", "Zigzag path"],
+    answer: "One direction"
+  },
+  {
+    question: "A transistor is used for:",
+    options: ["Cooling", "Amplification", "Compression", "Heating"],
+    answer: "Amplification"
+  },
+  {
+    question: "The basic components of an electric circuit are:",
+    options: ["Bulb, switch, wire", "Phone, speaker, light", "Generator, fan, switch", "None of the above"],
+    answer: "Bulb, switch, wire"
+  },
+  {
+    question: "In a parallel circuit, the voltage across each component is:",
+    options: ["Different", "Same", "Inverse", "Zero"],
+    answer: "Same"
+  },
+  {
+    question: "An instrument used to measure electric current is:",
+    options: ["Voltmeter", "Thermometer", "Ammeter", "Barometer"],
+    answer: "Ammeter"
+  },
+  {
+    question: "The pressure in a liquid increases with:",
+    options: ["Temperature", "Depth", "Light", "Width"],
+    answer: "Depth"
+  },
+  {
+    question: "Brownian motion provides evidence for:",
+    options: ["Magnetism", "Particle nature of matter", "Electricity", "Sound"],
+    answer: "Particle nature of matter"
+  },
+  {
+    question: "The upward force on a body in fluid is called:",
+    options: ["Gravity", "Thrust", "Upthrust", "Resistance"],
+    answer: "Upthrust"
+  },
+  {
+    question: "A hydrometer is used to measure:",
+    options: ["Pressure", "Density of liquids", "Temperature", "Volume"],
+    answer: "Density of liquids"
+  },
+  {
+    question: "The area under a velocity-time graph gives:",
+    options: ["Acceleration", "Distance", "Force", "Speed"],
+    answer: "Distance"
+  }
+]
+
+}
+
+// Shuffle array helper
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
+// Timer
+let timerInterval;
+let timeLeft = 25 * 60; // 25 minutes
+
+function startTimer() {
+  const timerDisplay = document.getElementById('timer');
+  timerInterval = setInterval(() => {
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      submitExam();
+    } else {
+      const minutes = Math.floor(timeLeft / 60);
+      const seconds = timeLeft % 60;
+      timerDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+      timeLeft--;
+    }
+  }, 1000);
+}
+
+// Navigation
+function showPage(pageId) {
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.getElementById(pageId).classList.add("active");
+}
+
+function goToSubjectPage() {
+  const email = document.getElementById('email').value;
+  if (!email.includes("@")) {
+    alert("Please enter a valid email.");
+    return;
+  }
+  generateSubjectOptions();
+  showPage("subjectPage");
+}
+
+// Populate subject selection
+function generateSubjectOptions() {
+  const subjectList = document.getElementById("subjectList");
+  subjectList.innerHTML = "";
+  const subjects = Object.keys(allQuestions);
+  subjects.forEach(subject => {
+    const label = document.createElement("label");
+    label.innerHTML = `<input type="checkbox" value="${subject}" onchange="limitSubjects()"> ${subject}`;
+    subjectList.appendChild(label);
+    subjectList.appendChild(document.createElement("br"));
+  });
+}
+
+// Limit to 4 subject choices
+function limitSubjects() {
+  const selected = document.querySelectorAll("#subjectList input:checked");
+  if (selected.length > 4) {
+    alert("You can only select 4 subjects.");
+    this.checked = false;
+  }
+}
+
+// Start Exam
+function startExam() {
+  const selected = Array.from(document.querySelectorAll("#subjectList input:checked")).map(cb => cb.value);
+  if (selected.length !== 4) {
+    alert("Please select exactly 4 subjects.");
+    return;
+  }
+
+  const examForm = document.getElementById("examForm");
+  examForm.innerHTML = "";
+  let qNum = 1;
+
+  selected.forEach(subject => {
+    const randomQuestions = shuffle([...allQuestions[subject]]).slice(0, 5);
+    randomQuestions.forEach(q => {
+      const div = document.createElement("div");
+      div.innerHTML = `<h4>(${qNum}) [${subject}] ${q.question}</h4>`;
+      if (!q.options) {
+  console.error("Missing options:", q);
+  return;
+}
+
+      q.options.forEach((opt, i) => {
+        const optionId = `${subject}-${qNum}-${i}`;
+        div.innerHTML += `
+          <label>
+            <input type="radio" name="q${qNum}" value="${opt}" />
+            ${opt}
+          </label><br>`;
+      });
+      div.innerHTML += `<input type="hidden" name="answer${qNum}" value="${q.answer}">`;
+      examForm.appendChild(div);
+      qNum++;
+    });
+  });
+
+  showPage("examPage");
+  startTimer();
+}
+
+// Submit Exam
+function submitExam() {
+  clearInterval(timerInterval);
+  const form = document.getElementById("examForm");
+  let score = 0;
+  const total = 20;
+
+  for (let i = 1; i <= total; i++) {
+    const selected = form.querySelector(`input[name="q${i}"]:checked`);
+    const correct = form.querySelector(`input[name="answer${i}"]`).value;
+    if (selected && selected.value === correct) {
+      score += 2.5;
+    }
+  }
+
+  document.getElementById("result").classList.remove("hidden");
+  document.getElementById("result").innerHTML = `<h3>Score: ${score}/50</h3>`;
+}
+</script>
